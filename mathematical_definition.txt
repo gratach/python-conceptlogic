@@ -1,0 +1,134 @@
+# Definition Konzeptlogik:
+
+Wir wollen ein einfaches Modell aufstellen, in dem logische Konzepte als mathematische Objekte definiert werden können.
+Dabei soll ein logisches Konzept auch eine Art von Beziehung darstellen können, die zwischen zwei anderen Konzepten bestehen kann.
+
+Eine Menge von Konzepten soll folgende Eigenschaften haben:
+
+Wenn man für die Variablen A, B und C jeweils Elemente aus der Menge der Konzepte einsetzt, soll diesem Tripel ein eindeutiger Wahrheitswert zugeordnet sein.
+Dieser Wert gibt dabei an ob das Konzept A zu dem Konzept C in einer Beziehung steht, die durch das Konzept B beschrieben wird.
+
+Als nächstes soll ein Mechanismus beschrieben werden, der es ermöglicht, auf Grundlage einer Menge von Konzepten neue Konzepte zu definieren.
+Die Definition eines neuen Konzeptes soll dabei erfolgen, indem zu einer Teilmenge aller möglichen Tripel, die aus den bestehenden Konzepten und dem neuen Konzept gebildet werden können, jeweils angegeben wird, ob diese auf entsprechende Weise in Beziehung stehen oder nicht.
+
+Zu jedem Versuch, auf diese Weise ein neues Konzept zu definieren, soll der Mechanismus eines der vier folgenden Ergebnisse liefern:
+1. Die Definition ist widersprüchlich und kann nicht verwendet werden.
+2. Die Definition ist nicht widersprüchlich, aber das neue Konzept ist nicht wohldefiniert.
+3. Die Definition ist nicht widersprüchlich, das neue Konzept ist wohldefiniert, aber es ist mit einem der bestehenden Konzepte identisch.
+    In diesem Fall muss der Mechanismus angeben, um welches bestehende Konzept es sich handelt und sicherstellen, dass die Wahrheitswerte der Tripel, die das bestehende Konzept enthalten, nicht im Widerspruch zu der Definition des neuen Konzepts stehen.
+4. Die Definition ist nicht widersprüchlich, das neue Konzept ist wohldefiniert und es ist nicht mit einem der bestehenden Konzepte identisch.
+    In diesem Fall muss der Mechanismus zu sämtlichen verbleibenden Tripeln, die sich aus dem neuen Konzept und den bestehenden Konzepten bilden lassen, angeben, ob diese auf entsprechende Weise in Beziehung stehen oder nicht.
+
+Auf diese Weise soll der Mechanismus genutzt werden können, um ausgehend von einer Menge von Grundkonzepten über mehrere Iterationen hinweg neue Elemente zu der Menge der bekannten Konzepte hinzuzufügen.
+
+Dazu muss der Mechanismus muss außerdem folgende Kriterien erfüllen:
+1. Die Reihenfolge, in der die neuen Konzepte definiert werden, darf keinen Einfluss auf das Ergebnis haben.
+    Wenn also die Konzepte A und B jeweils auf Grundlage einer Menge M aus bekannten Konzepten definiert werden können, dann müssen die Wahrheitswerte aller Tripel in denen sowohl A als auch B vorkommen, unabhängig davon, ob A oder B zuerst definiert wurde, gleich sein.
+2. Wenn sich ein Konzept durch Beschreibung der Verknüpfungen mit anderen Konzepten eindeutig definieren lässt, dann muss ausgeschlossen sein, dass ein zweites Konzept erzeugt werden kann, dass nicht identisch zum ersten ist, aber ebenfalls die beschriebenen Verknüpfungen aufweist.
+
+Ein Mechanismus, der diese Kriterien erfüllt, gemeinsam mit einer Menge von Grundkonzepten, auf deren Grundlage der Mechanismus definiert ist, soll Konzeptlogik genannt werden.
+
+
+# Weitere Definitionen:
+
+Eine Konzeptlogik, deren Konzepte sich nur durch Nennung von Tripeln mit positiven Wahrheitswerten definieren lassen, soll als 'positiv definiert' bezeichnet werden.
+
+Eine Konzeptlogik soll dann als "Konzeptlogik mit separaten Knoten und Kanten" bezeichnet werden wenn sie
+1. alle ihre Konzepte in eine der beiden Kategorien 'Knoten' und 'Kanten' einteilt
+2. allen Tripeln, bei denen nicht das mittlere Konzept eine Kante und die übrigen Knoten sind, den Wahrheitswert 'falsch' zuordnet.
+
+Eine Konzeptlogik soll dann als "Konzeptlogik mit festen Kanten" bezeichnet werden wenn sie
+1. eine Konzeptlogik mit separaten Knoten und Kanten ist
+2. keine Konzepte enthält, die Kanten sind und nicht zu den Grundkonzepten gehören
+
+
+# Beispiel einer positiv definierten Konzeptlogik mit festen Kanten:
+
+Aus den vier Grundkonzepten (1), (erstes Argument der Summe von), (zweites Argument der Summe von) und (ergibt) können durch eine entsprechende Konzeptlogik alle natürlichen Zahlen und alle Summen aus zwei natürlichen Zahlen als Konzepte definiert werden sodass folgendes gilt:
+1. Das Tripel X (erstes Argument der Summe von) Y ist genau dann wahr, wenn X eine natürliche Zahl ist, Y eine Summe aus zwei natürlichen Zahlen ist und X das erste Argument dieser Summe ist.
+2. Das Tripel X (zweites Argument der Summe von) Y ist genau dann wahr, wenn X eine natürliche Zahl ist, Y eine Summe aus zwei natürlichen Zahlen ist und X das zweite Argument dieser Summe ist.
+3. Das Tripel X (ergibt) Y ist genau dann wahr, wenn X eine Summe aus zwei natürlichen Zahlen ist und Y die Summe dieser beiden Zahlen ist.
+4. Alle anderen Tripel sind falsch.
+
+Dabei könnte man das Konzept (1 + 0) aus den Grundkonzepten definieren indem man folgende Tripel als wahr definiert:
+1. (1) (erstes Argument der Summe von) (1 + 0)
+2. (1 + 0) (ergibt) (1)
+
+Im nächsten Schritt könnte man das Konzept (0) definieren in dem man folgendes Tripel als wahr definiert:
+1. (0) (zweites Argument der Summe von) (1 + 0)
+
+
+# Fragen:
+
+Welche Kriterien muss die Definition einer Konzeptlogik erfüllen, damit sie vollständig definiert und nicht widersprüchlich ist?
+Wie könnte eine möglichst allgemeine Vorgehensweise aussehen um eine Konzeptlogik zu definieren?
+Ist es möglich eine Konzeptlogik mit einer endlichen Anzahl an Grundkonzepten zu definieren, die alle möglichen Konzeptlogiken mit endlicher Anzahl an Grundkonzepten durch Konzepte repräsentieren kann?
+
+
+
+# Definition:
+
+We want to establish a simple model in which logical concepts can be defined as mathematical objects. 
+In this model, a logical concept should also be able to represent a type of relationship that can exist between two other concepts.
+
+A set of concepts should have the following properties:
+
+When elements from the set of concepts are substituted for variables A, B, and C, a unique truth value should be assigned to this triplet. 
+This value indicates whether concept A is in a relationship with concept C as described by concept B.
+
+Next, a mechanism should be described that allows the definition of new concepts based on a set of existing concepts. 
+The definition of a new concept should be done by specifying, for a subset of all possible triplets that can be formed from the existing concepts and the new concept, whether they are in the corresponding relationship or not.
+
+For each attempt to define a new concept in this way, the mechanism should provide one of the following four results:
+
+1. The definition is contradictory and cannot be used.
+2. The definition is not contradictory, but the new concept is not well-defined.
+3. The definition is not contradictory, the new concept is well-defined, but it is identical to one of the existing concepts. 
+    In this case, the mechanism must specify which existing concept it is and ensure that the truth values of the triplets containing the existing concept do not contradict the definition of the new concept.
+4. The definition is not contradictory, the new concept is well-defined, and it is not identical to any of the existing concepts. 
+    In this case, the mechanism must specify, for all remaining triplets that can be formed from the new concept and the existing concepts, whether they are in the corresponding relationship or not.
+
+In this way, the mechanism should be used to add new elements to the set of known concepts starting from a set of basic concepts over several iterations.
+
+Additionally, the mechanism must satisfy the following criteria:
+
+1. The order in which the new concepts are defined should not affect the result. 
+    So, if concepts A and B can each be defined based on a set M of known concepts, then the truth values of all triplets in which both A and B appear must be the same regardless of whether A or B is defined first.
+2. If a concept can be uniquely defined by describing its connections to other concepts, then it should be excluded that a second concept can be created that is not identical to the first but also exhibits the described connections.
+
+A mechanism that satisfies these criteria, along with a set of basic concepts on which the mechanism is defined, shall be referred to as 'Concept Logic'.
+
+# Further definitions:
+
+A concept logic whose concepts can be defined by listing only triplets with positive truth values shall be referred to as 'positively defined'.
+
+A concept logic shall be referred to as "concept logic with separate vertices and edges" if it
+1. divides all its concepts into one of the two categories 'vertices' and 'edges'
+2. assigns the truth value 'false' to all triplets that do not contain an edge as the middle concept and vertices as the remaining concepts.
+
+A concept logic shall be referred to as "concept logic with fixed edges" if it
+1. is a concept logic with separate vertices and edges
+2. does not contain any concepts that are edges and do not belong to the basic concepts
+
+
+# Example of a positively defined concept logic with fixed edges:
+
+From the four basic concepts (1), (first argument of the sum of), (second argument of the sum of) and (results in), all natural numbers and all sums of two natural numbers can be defined as concepts by an appropriate concept logic so that the following applies:
+1. The triplet X (first argument of the sum of) Y is true if and only if X is a natural number, Y is a sum of two natural numbers, and X is the first argument of this sum.
+2. The triplet X (second argument of the sum of) Y is true if and only if X is a natural number, Y is a sum of two natural numbers, and X is the second argument of this sum.
+3. The triplet X (results in) Y is true if and only if X is a sum of two natural numbers and Y is the sum of these two numbers.
+4. All other triplets are false.
+
+In this way, the concept (1 + 0) could be defined from the basic concepts by defining the following triplets as true:
+1. (1) (first argument of the sum of) (1 + 0)
+2. (1 + 0) (results in) (1)
+
+In the next step, the concept (0) could be defined by defining the following triplet as true:
+1. (0) (second argument of the sum of) (1 + 0)
+
+
+# Questions:
+
+What criteria must the definition of a concept logic satisfy in order to be fully defined and not contradictory?
+What could be a general procedure for defining a concept logic?
+Is it possible to define a concept logic with a finite number of basic concepts that can represent all possible concept logics with a finite number of basic concepts by concepts?
