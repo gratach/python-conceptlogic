@@ -242,22 +242,27 @@ class ConceptLogic:
             conceptsByReference[reference] = self.getConceptFromData(conceptImplementation, byteData)
             if reference in unimportedReferences:
                 unimportedReferences.remove(reference)
-        # Iterate over all untasted references and try to import the Concepts.
+        # Iterate over all untested references and try to import the Concepts.
         untestedReferences.update(unimportedReferences)
         while untestedReferences:
             reference = untestedReferences.pop()
             # Get the semanticConnections of the reference.
-            semanticConnections = set()
-            semanticConnections.update([(None, conceptsByReference[triple[1]], conceptsByReference[triple[2]]) for triple in referenceTriplesBySubjectReference[reference] if triple[1] in conceptsByReference and triple[2] in conceptsByReference])
-            semanticConnections.update([(conceptsByReference[triple[0]], None, conceptsByReference[triple[2]]) for triple in referenceTriplesByPredicateReference[reference] if triple[0] in conceptsByReference and triple[2] in conceptsByReference])
-            semanticConnections.update([(conceptsByReference[triple[0]], conceptsByReference[triple[1]], None) for triple in referenceTriplesByObjectReference[reference] if triple[0] in conceptsByReference and triple[1] in conceptsByReference])
+            semanticConnectionReferences = set()
+            semanticConnectionReferences.update([(None, triple[1], triple[2]) for triple in referenceTriplesBySubjectReference[reference]])
+            semanticConnectionReferences.update([(triple[0], None, triple[2]) for triple in referenceTriplesByPredicateReference[reference]])
+            semanticConnectionReferences.update([(triple[0], triple[1], None) for triple in referenceTriplesByObjectReference[reference]])
+            semanticConnections = frozenset([
+                (conceptsByReference[sub] if sub != None else None, conceptsByReference[pred] if pred != None else None, conceptsByReference[obj] if obj != None else None)
+                for sub, pred, obj in semanticConnectionReferences
+                if (sub == None or sub in conceptsByReference) and (pred == None or pred in conceptsByReference) and (obj == None or obj in conceptsByReference) 
+            ])
             # Try to import the Concept.
             try:
                 concept = self.getConceptFromSemanticConnections(semanticConnections)
                 conceptsByReference[reference] = concept
                 unimportedReferences.remove(reference)
                 # Put all connected references back into the untestedReferences set.
-                connectedReferences = set([reference for triple in semanticConnections for reference in triple if reference != None and reference in unimportedReferences])
+                connectedReferences = set([reference for triple in semanticConnectionReferences for reference in triple if reference != None and reference in unimportedReferences])
                 untestedReferences.update(connectedReferences)
             except semanticConnectionsNotSufficient:
                 pass

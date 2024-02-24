@@ -22,16 +22,16 @@ class DirectAbstraction(metaclass=CodedConceptClass):
         return isinstance(content, Concept)
     
 
-constructedAbstractionHasConnections = abstractIdentities("constructedAbstractionHasConnections")
-class ConstructedAbstraction(metaclass=CodedConceptClass):
-    """
-    A concept, that is a distinct construction made of other abstractConcepts
-    It has a semanticConnections frozenset as conceptContent that only containes abstractConcepts.
-    It uses connectionsConcepts to load and safe its content as semanticConnections
-    """
-    def getContentFromConnections(semanticConnections, conceptLogic):
-        connections = readDistinctConnection(constructedAbstractionHasConnections, semanticConnections, conceptLogic).content
-        connectio
+#constructedAbstractionHasConnections = abstractIdentities("constructedAbstractionHasConnections")
+#class ConstructedAbstraction(metaclass=CodedConceptClass):
+#    """
+#    A concept, that is a distinct construction made of other abstractConcepts
+#    It has a semanticConnections frozenset as conceptContent that only containes abstractConcepts.
+#    It uses connectionsConcepts to load and safe its content as semanticConnections
+#    """
+#    def getContentFromConnections(semanticConnections, conceptLogic):
+#        connections = readDistinctConnection(constructedAbstractionHasConnections, semanticConnections, conceptLogic).content
+#        connectio
 
 def isAbstractConcept(concept):
     if not isinstance(concept, Concept):

@@ -25,6 +25,8 @@ with StringIO() as s:
     s.seek(0)
     rt2 = readTriples(s, sl)
     print(all([c in rt1.values() for c in concepts]))
+    for c in concepts.difference(set(rt1.values())):
+        print(getConceptName(c))
     print(set(rt1) == set(rt2))
     print(s1 == s3)
 
