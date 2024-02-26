@@ -263,7 +263,7 @@ class StandardConceptImplementation(ConceptImplementation):
         conceptCreationFunction = lambda standardLogic : standardLogic.getConceptFromContent(self, contentCreationFunction(standardLogic))
         if standardLogic != None:
             return conceptCreationFunction(standardLogic)
-        return SimpleConceptGetter(self, conceptCreationFunction)
+        return SimpleConceptGetter(conceptCreationFunction)
     
     def __repr__(self):
         return "ConceptImplementation " + self.implementationName + " " + self.version
