@@ -110,6 +110,8 @@ from ..conceptLogic.conceptLogic import ConceptImplementation, ConceptIdentity, 
 from .standardLogic import StandardNamespace as sn
 from .standardTools import ConceptGetter, SimpleConceptGetter, emptyConceptIdentity, SimpleConceptIdentity, ensureConcept
 
+basicsPrefix = b"basics"
+
 
 class StandardLogic(ConceptLogic):
     """
@@ -152,16 +154,16 @@ class constructrionArgumentNotValid(Exception): # Exception raised by getContent
     def __init__(self):
         super().__init__("The python construction argument is not valid.")
 
-_standardConceptImplementationByUUID = {}
-_UUIDByStandardConceotImplementation = {}
-_StandardConceptImplementationNamespaceUUID = uuid.uuid3(uuid.NAMESPACE_DNS, "StandardConceptImplementationNamespaceUUID")
+_standardConceptImplementationById = {}
+_IdByStandardConceotImplementation = {}
 class StandardConceptImplementation(ConceptImplementation):
     """
     A StandardConceptImplementation object is a ConceptImplementation that has an uuid assigned to it.
     The uuid is generated from the name and version of the StandardConceptImplementation.
     Besides the function arguments of ConceptImplementation, the constructor of StandardConceptImplementation also takes:
         name: The name of the StandardConceptImplementation.
-        version: The version of the StandardConceptImplementation.
+        prefix: The prefix of the StandardConceptImplementation is a bytes object.
+            Together with the name it is used to generate the id of the StandardConceptImplementation.
         and optionally:
             getContentFromPythonObject: A function that converts a python object to the ConceptContent.
                 This does not have to be invertible.
@@ -174,27 +176,26 @@ class StandardConceptImplementation(ConceptImplementation):
     # The construction modes
     pythonObjectMode, semanticConnectionsMode, contentMode, dataMode = "pythonObject", "semanticConnections", "content", "data"
 
-    def __init__(self, name, version, 
+    def __init__(self, name, prefix, 
                  getContentFromData = None, getDataFromContent = None,
                  getContentFromConnections = None, getConnectionsFromContent = None,  
                  contentValid = None, initializeConcept = None,
                  implementationSupported = None, getConceptAttribute = None, callConcept = None,
                  getContentFromPythonObject = None, prefaredConstructionMode = None, getConceptClassFromContent = None,
                  getNameFromContent = None):
-        self.implementationName = name
-        self.version = version
         self.getContentFromPythonObject = getContentFromPythonObject
         self.getConceptClassFromContent = getConceptClassFromContent
         self.getNameFromContent = getNameFromContent
         self._prefaredConstructionMode = prefaredConstructionMode
-        # Generate a UUID for this instance
-        self.uuid = uuid.uuid3(_StandardConceptImplementationNamespaceUUID, name + " " + version)
-        # Check if there is already a StandardConceptImplementation with this uuid
-        if self.uuid in _standardConceptImplementationByUUID:
+        self.implementationName = name
+        self.prefix = prefix
+        self.id = prefix + b"." + name.encode("utf-8")
+        # Check if there is already a StandardConceptImplementation with this id
+        if self.id in _standardConceptImplementationById:
             raise Exception("There is already a RegisteredConceptImplementation with this uuid.")
         # Add this instance to the dictionarys
-        _standardConceptImplementationByUUID[self.uuid] = self
-        _UUIDByStandardConceotImplementation[self] = self.uuid
+        _standardConceptImplementationById[self.id] = self
+        _IdByStandardConceotImplementation[self] = self.id
         # Initialize the ConceptImplementation
         super().__init__(getContentFromData = getContentFromData, getDataFromContent = getDataFromContent, 
                          getContentFromConnections =  getContentFromConnections, getConnectionsFromContent = getConnectionsFromContent,  
@@ -281,14 +282,14 @@ class DataConceptImplementation(StandardConceptImplementation, ConceptIdentity, 
             seedObject.__class__ = DataConceptImplementation
             return seedObject
         return object.__new__(cls)
-    def __init__(self, name,  version,
+    def __init__(self, name,  prefix,
                  getContentFromData, getDataFromContent, 
                  contentValid = None, initializeConcept = None,
                  implementationSupported = None, getConceptAttribute = None, callConcept = None,
                  getContentFromPythonObject = None, seedObject = None, getNameFromContent = None):
         self.identityName = name
         # Initialize the RegisteredConceptImplementation
-        StandardConceptImplementation.__init__(self, name + "Implementation", version,
+        StandardConceptImplementation.__init__(self, name + "Implementation", prefix,
                          getContentFromData = getContentFromData, getDataFromContent = getDataFromContent, 
                          getContentFromConnections=None, getConnectionsFromContent=None,
                          contentValid=contentValid, initializeConcept=initializeConcept,
@@ -308,14 +309,14 @@ class ConstructedConceptImplementation(StandardConceptImplementation):
               This class has only one instance: generalConstructedConceptClassImplementation.
         2) SpecifiedConstructedConceptImplementation: A ConstructedConceptImplementation with a specified functionality, that is adapted to the concepts that use it.
     """
-    def __init__(self, name,  version,
+    def __init__(self, name,  prefix,
                  getContentFromConnections, getConnectionsFromContent, 
                  getContentFromData = None, getDataFromContent = None, 
                  contentValid = None, initializeConcept = None,
                  implementationSupported = None, getConceptAttribute = None, callConcept = None,
                  getContentFromPythonObject = None, getConceptClassFromContent = None, getNameFromContent = None):
         # Initialize the RegisteredConceptImplementation
-        StandardConceptImplementation.__init__(self, name, version,
+        StandardConceptImplementation.__init__(self, name, prefix,
                          getContentFromData=getContentFromData, getDataFromContent=getDataFromContent, 
                          getContentFromConnections=getContentFromConnections, getConnectionsFromContent=getConnectionsFromContent, 
                          contentValid=contentValid, initializeConcept=initializeConcept,
@@ -338,7 +339,7 @@ class GeneralConstructedConceptImplementation(ConstructedConceptImplementation):
         if generalConstructedConceptImplementation != None:
             raise Exception("Only one GeneralConstructedConceptClassImplementation object 'generalConstructedConceptClassImplementation' can be created")
         generalConstructedConceptImplementation = self
-        super().__init__("generalConstructedConceptClassImplementation", "0.0", self.getContentFromConnections, self.getConnectionsFromContent)
+        super().__init__("generalConstructedConceptClassImplementation", basicsPrefix, self.getContentFromConnections, self.getConnectionsFromContent)
 
     def getContentFromConnections(self, semanticConnections, conceptLogic):
         # TODO Filter semanticConnections
@@ -361,16 +362,15 @@ class SpecifiedConstructedConceptImplementation(ConstructedConceptImplementation
     A SpecifiedConstructedConceptClassImplementation object is a ConstructedConceptImplementation with a specified functionality, that is adapted to the concepts that use it.
     Each SpecifiedConstructedConceptClassImplementation object belongs to a ConstructedConceptClassIdentity object.
     """
-    def __init__(self, name, version, getContentFromConnections, getConnectionsFromContent, 
+    def __init__(self, name, prefix, getContentFromConnections, getConnectionsFromContent, 
                  getContentFromData = None, getDataFromContent = None, contentValid=None, getNameFromContent=None, getContentFromPythonObject=None):
         # Initialize the ConceptIdentity. Use specificConstructedConceptClassImplementation as the conceptImplementation (empty object on the first run). Use a self returning function as the contentCreationFunction
         ConceptIdentity.__init__(self, SpecifiedConstructedConceptImplementation, lambda conceptLogic: self)
         # Initialize the ConstructedConceptClassIdentity
         self.name = name
-        self.version = version
         self.classIdentity = None
         self._innerGetConnectionsFromContent = getConnectionsFromContent
-        super().__init__(name, version,
+        super().__init__(name, prefix,
                          getContentFromConnections=getContentFromConnections, getConnectionsFromContent=self._wrappedGetConnectionsFromContent,
                           getContentFromData=getContentFromData, getDataFromContent=getDataFromContent, contentValid=contentValid,
                           getNameFromContent=getNameFromContent, getContentFromPythonObject=getContentFromPythonObject)
@@ -392,9 +392,8 @@ class SpecifiedConstructedConceptImplementation(ConstructedConceptImplementation
         pass
 
 _constructedConceptClassIdentityBySemanticConnectionIdentities = {}
-_constructedConceptClassIdentityByUUID = {}
-_UUIDByConstructedConceptClassIdentity = {}
-_ConstructedConceptClassIdentityNamespaceUUID = uuid.uuid3(uuid.NAMESPACE_DNS, "ConstructedConceptClassIdentityNamespaceUUID")
+_constructedConceptClassIdentityById = {}
+_IdByConstructedConceptClassIdentity = {}
 class ConstructedConceptClassIdentity(ConceptIdentity):
     """
     A ConstructedConceptClassIdentity object is the ConceptIdentity of a constructedConceptClass concept.
@@ -408,18 +407,18 @@ class ConstructedConceptClassIdentity(ConceptIdentity):
             return seedObject
         return object.__new__(cls)
 
-    def __init__(self, implementations, semanticConnectionIdentities, name, version, seedObject = None): # TODO Finish definition
+    def __init__(self, implementations, semanticConnectionIdentities, name, prefix, seedObject = None): # TODO Finish definition
         self.implementations = implementations
         self.identityName = name
-        self.version = version
-        # Generate a UUID for this instance
-        self.uuid = uuid.uuid3(_ConstructedConceptClassIdentityNamespaceUUID, name + " " + version)
-        # Check if there is already a StandardConceptImplementation with this uuid
-        if self.uuid in _constructedConceptClassIdentityByUUID:
+        self.prefix = prefix
+        # Generate a id for this instance
+        self.id = prefix + b"." + name.encode("utf-8")
+        # Check if there is already a StandardConceptImplementation with this id
+        if self.id in _constructedConceptClassIdentityById:
             raise Exception("There is already a RegisteredConceptImplementation with this uuid.")
         # Add this instance to the dictionarys
-        _constructedConceptClassIdentityByUUID[self.uuid] = self
-        _UUIDByConstructedConceptClassIdentity[self] = self.uuid
+        _constructedConceptClassIdentityById[self.id] = self
+        _IdByConstructedConceptClassIdentity[self] = self.id
         # Add this ConstructedConceptClassIdentity to all SpecifiedConstructedConceptImplementations
         for implementation in implementations:
             implementation.classIdentity = self
@@ -530,7 +529,7 @@ class CodedConceptClass(type):
             contentsByMetadata[metadata].append((name, content))
         
         # Extract the version
-        version = attrs.pop("version") if "version" in attrs else "0.0"
+        prefix = attrs.pop("prefix") if "prefix" in attrs else b"default"
 
         # Extract the data conversion methodes if they exist
         getContentFromData = attrs.get("getContentFromData")
@@ -598,14 +597,14 @@ class CodedConceptClass(type):
             # Extract the content valid methode if it exists
             CIContentValid = CIAttrs.pop("contentValid") if "contentValid" in CIAttrs else None
 
-            # Ectract the version if exists
-            CIVersion = CIAttrs.pop("version") if "version" in CIAttrs else "0.0"
+            # Ectract the prefix if exists
+            CIPrefix = CIAttrs.pop("prefix") if "prefix" in CIAttrs else prefix
             
             # TODO concept methodes
 
             codedImplementations.append({
                 "name" : name,
-                "version" : CIVersion,
+                "prefix" : CIPrefix,
                 "getContentFromConnections" : CIGetContentFromConnections,
                 "getConnectionsFromContent" : CIGetConnectionsFromContent,
                 "getContentFromData" : CIGetContentFromData,
@@ -620,7 +619,7 @@ class CodedConceptClass(type):
             
         # A DataConceptImplementation gets created if there are data conversion methodes but no connection conversion methodes and no CodedImplementations defined.
         if getContentFromData != None and getContentFromConnections == None and len(codedImplementations) == 0:
-            return DataConceptImplementation(clsname, version, getContentFromData, getDataFromContent, contentValid, getContentFromPythonObject=getContentFromPythonObject, getNameFromContent=getNameFromContent , seedObject=seedObject)
+            return DataConceptImplementation(clsname, prefix, getContentFromData, getDataFromContent, contentValid, getContentFromPythonObject=getContentFromPythonObject, getNameFromContent=getNameFromContent , seedObject=seedObject)
         
         if semanticConnectionIdentities == None:
             # Temporary solution:
@@ -630,7 +629,7 @@ class CodedConceptClass(type):
         
         if len(codedImplementations) == 0: # A ConstructedConceptClassIdentity gets created with a single ConstructedConceptImplementation 
             # Create a SpecifiedConstructedConceptImplementation
-            implementations = [SpecifiedConstructedConceptImplementation(clsname + "Implementation", version, 
+            implementations = [SpecifiedConstructedConceptImplementation(clsname + "Implementation", prefix, 
                                                                          getContentFromConnections=getContentFromConnections, getConnectionsFromContent=getConnectionsFromContent, 
                                                                          getContentFromData=getContentFromData, getDataFromContent=getDataFromContent,
                                                                          contentValid=contentValid, getNameFromContent=getNameFromContent, getContentFromPythonObject=getContentFromPythonObject)]
@@ -638,12 +637,12 @@ class CodedConceptClass(type):
             # Create the list of SpecifiedConstructedConceptImplementations
             implementations = []
             for codedImplementation in codedImplementations:
-                implementations.append(SpecifiedConstructedConceptImplementation(codedImplementation["name"], codedImplementation["version"],
+                implementations.append(SpecifiedConstructedConceptImplementation(codedImplementation["name"], codedImplementation["prefix"],
                                                                                  getContentFromConnections=codedImplementation["getContentFromConnections"], getConnectionsFromContent=codedImplementation["getConnectionsFromContent"],
                                                                                  getContentFromData=codedImplementation["getContentFromData"], getDataFromContent=codedImplementation["getDataFromContent"],
                                                                                  contentValid=codedImplementation["contentValid"], getNameFromContent=codedImplementation["getNameFromContent"],
                                                                                  getContentFromPythonObject=codedImplementation["getContentFromPythonObject"]))
-        return ConstructedConceptClassIdentity(implementations, semanticConnectionIdentities, clsname, version, seedObject=seedObject)
+        return ConstructedConceptClassIdentity(implementations, semanticConnectionIdentities, clsname, prefix, seedObject=seedObject)
 
 
 DataConceptClass = emptyConceptIdentity()
@@ -653,13 +652,14 @@ class DataConceptClass(metaclass = CodedConceptClass):
     It uses the DataConceptImplementation of the instances of the class as ConceptContent and stores it as data using its uuid.
     """
 
+    prefix = basicsPrefix
     seedObject = DataConceptClass
     
     def getContentFromData(data, conceptLogic):
-        return _standardConceptImplementationByUUID[uuid.UUID(bytes.decode(data, "utf8"))]
+        return _standardConceptImplementationById[data]
 
     def getDataFromContent(content, conceptLogic):
-        return bytes(str(_UUIDByStandardConceotImplementation[content]), "utf8")
+        return _IdByStandardConceotImplementation[content]
     
     def contentValid(content, conceptLogic):
         return isinstance(content, DataConceptImplementation)
@@ -676,6 +676,7 @@ class ConstructedConceptClass(metaclass = CodedConceptClass):
     """
 
     seedObject = ConstructedConceptClass
+    prefix = basicsPrefix
     semanticConnectionIdentities = [(None, identifiedByTemporarySolution, temporaryConstructedConceptClassIdentifyer)]
 
     @CodedImplementation
@@ -704,10 +705,10 @@ class ConstructedConceptClass(metaclass = CodedConceptClass):
             ])
     
         def getContentFromData(data, conceptLogic):
-            return _constructedConceptClassIdentityByUUID[uuid.UUID(bytes.decode(data, "utf8"))]
+            return _constructedConceptClassIdentityById[data]
 
         def getDataFromContent(content, conceptLogic):
-            return bytes(str(_UUIDByConstructedConceptClassIdentity[content]), "utf8")
+            return _IdByConstructedConceptClassIdentity[content]
         
         def contentValid(content, conceptLogic):
             return isinstance(content, ConstructedConceptClassIdentity)

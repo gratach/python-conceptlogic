@@ -2,7 +2,7 @@ from typing import Hashable
 from ast import literal_eval
 from uuid import UUID
 from ..standardLogic.standardLogicEnsemble import StandardNamespace as sn
-from ..standardLogic.standardConceptImplementation import StandardConceptImplementation, _standardConceptImplementationByUUID
+from ..standardLogic.standardConceptImplementation import StandardConceptImplementation, _standardConceptImplementationById
 from .conceptLogic import Concept
 
 class StandardNameConvention:
@@ -56,7 +56,7 @@ def getConceptName(concept):
     
 def writeTriples(concepts, fs, 
                  stringNameConvention = None,
-                 referenceOfHasData = "hasData", referenceOfHasImplementation = "hasImplementation", referenceOfHasImplementationUUID = "hasImplementationUUID"):
+                 referenceOfHasData = "hasData", referenceOfHasImplementation = "hasImplementation", referenceOfHasImplementationId = "hasImplementationUUID"):
     """
     A function that writes a list of concepts to a file stream in a turtle like format.
     The stringNameConvention has to produce name strings with no newline charakters and no spaces
@@ -65,7 +65,7 @@ def writeTriples(concepts, fs,
         stringNameConvention = StandardNameConvention()
     hasDataName = stringNameConvention(referenceOfHasData, referenceOfHasData)
     hasImplementationName = stringNameConvention(referenceOfHasImplementation, referenceOfHasImplementation)
-    implementationUUIDName = stringNameConvention(referenceOfHasImplementationUUID, referenceOfHasImplementationUUID)
+    implementationUUIDName = stringNameConvention(referenceOfHasImplementationId, referenceOfHasImplementationId)
     # Get the exported SemanticData
     byteDataInfoByReference, referenceTriples = [*concepts][0].conceptLogic.exportSemanticData(concepts, stringNameConvention)
     # Get the implementations of concepts with data
@@ -75,8 +75,8 @@ def writeTriples(concepts, fs,
     triples = []
     for conceptImplementation in conceptImplementations:
         implementationName = stringNameConvention(conceptImplementation)
-        uuidstring = str(conceptImplementation.uuid)
-        triples.append((implementationName, implementationUUIDName, repr(uuidstring)))
+        idstring = conceptImplementation.id.decode("utf-8")
+        triples.append((implementationName, implementationUUIDName, repr(idstring)))
     # Sort alphabetically
     triples.sort(key = lambda x : (x[0].lower(), x[0], x[1].lower(), x[1], x[2].lower(), x[2]))
     # Write the conceptImplementations with their uuids
@@ -129,15 +129,15 @@ def readTriples(fs, standardLogic,
             triples.append((sub, pred, obj))
             continue
         raise Exception("The not empty lines have to contain a triple terminated by ' .'")
-    # Find the implementation UUIDs
-    UUIDByName = {}
+    # Find the implementation Ids
+    IdByName = {}
     for sub, obj in [(x, z) for x, y, z in triples if y == referenceOfHasImplementationUUID]:
-        UUIDByName[sub] = UUID(obj)
+        IdByName[sub] = obj.encode("utf8")
     # Find the implementations
     implementationByImplementationReference = {}
-    for name, uuid in UUIDByName.items():
-        if uuid in _standardConceptImplementationByUUID:
-            implementationByImplementationReference[name] = _standardConceptImplementationByUUID[uuid]
+    for name, id in IdByName.items():
+        if id in _standardConceptImplementationById:
+            implementationByImplementationReference[name] = _standardConceptImplementationById[id]
     # Extract the data concepts
     implementationByConceptReference = {}
     for sub, obj in [(x, z) for x, y, z in triples if y == referenceOfHasImplementation]:
