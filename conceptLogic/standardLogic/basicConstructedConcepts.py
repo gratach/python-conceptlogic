@@ -1,12 +1,11 @@
 
-from .standardConceptImplementation import CodedConceptClass, getConceptClass
+from .standardConceptImplementation import CodedConceptClass, getConceptClass, basicsPrefix
 from ..conceptLogic.conceptLogic import Concept, semanticConnectionsNotSufficient, semanticConnectionsNotValid
-from .basicDataConcepts import uuidIdentity, NumberConcept, UUIDConcept, identityNamespace
+from .basicDataConcepts import NumberConcept, UUIDConcept, newIdentityConcept
 from .standardTools import ensureConcept
 
-basicIdentities = identityNamespace("basicIdentities")
-hasSetCount = basicIdentities("hasSetCount")
-hasSetEntry = basicIdentities("hasSetEntry")
+hasSetCount = newIdentityConcept("hasSetCount", basicsPrefix)
+hasSetEntry = newIdentityConcept("hasSetEntry", basicsPrefix)
 
 def readDistinctConnections(connectionType, expectedNumberOfConnections, semanticConnections, conceptLogic):
     predConcept = ensureConcept(connectionType, conceptLogic)
@@ -35,6 +34,7 @@ class SetConcept(metaclass=CodedConceptClass):
     A set containing multiple concepts.
     It uses python frozensets as concept content
     """
+    prefix = basicsPrefix
     def getContentFromConnections(semanticConnections, conceptLogic):
         countConcept = readDistinctConnection(hasSetCount, semanticConnections, conceptLogic)
         if not countConcept.implementation == NumberConcept:
@@ -52,15 +52,16 @@ class SetConcept(metaclass=CodedConceptClass):
         return isinstance(content, frozenset) and all([isinstance(concept, Concept) for concept in content])
     
 
-hasSubjectOfConnection = basicIdentities("hasSubjectOfConnection")
-hasPredicateOfConnection = basicIdentities("hasPredicateOfConnection")
-hasObjectOfConnection = basicIdentities("hasObjectOfConnection")
-hasConnectionSelfReferenceCount = basicIdentities("hasConnectionSelfReferenceCount")
+hasSubjectOfConnection = newIdentityConcept("hasSubjectOfConnection", basicsPrefix)
+hasPredicateOfConnection = newIdentityConcept("hasPredicateOfConnection", basicsPrefix)
+hasObjectOfConnection = newIdentityConcept("hasObjectOfConnection", basicsPrefix)
+hasConnectionSelfReferenceCount = newIdentityConcept("hasConnectionSelfReferenceCount", basicsPrefix)
 class ConnectionConcept(metaclass=CodedConceptClass):
     """
     A concept representing a single semantic connection
     It has an triple of subject predicate and object concepts as conceptContent where at least one of those is None
     """
+    prefix = basicsPrefix
     def getContentFromConnections(semanticConnections, conceptLogic):
         # Get subject predicate and object
         subjcon = hasSubjectOfConnection.getConcept(conceptLogic)
@@ -105,11 +106,11 @@ class ConnectionConcept(metaclass=CodedConceptClass):
             return False
         return True
     
-connectionsHasConnection = basicIdentities("connectionsHasConnection")
-connectionsHasConnectionCount = basicIdentities("connectionsHasConnectionCount")
+connectionsHasConnection = newIdentityConcept("connectionsHasConnection", basicsPrefix)
+connectionsHasConnectionCount = newIdentityConcept("connectionsHasConnectionCount", basicsPrefix)
     
 class ConnectionsConcept(metaclass=CodedConceptClass):
-
+    prefix = basicsPrefix
     def getContentFromConnections(semanticConnections, conceptLogic):
         # Get number of connnections
         countConcept = readDistinctConnection(connectionsHasConnectionCount, semanticConnections, conceptLogic)

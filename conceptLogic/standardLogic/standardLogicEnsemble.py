@@ -41,7 +41,7 @@ from .basicConstructedConcepts import SetConcept, ConnectionConcept, Connections
 """
 The .basicAbstractions module defines multiple basic ConstructedConceptClassIdentities for Abstract concepts
 """
-from .basicAbstractions import DirectAbstraction, ConstructedAbstraction, ReferencedAbstraction, ReferencefAbstractionNamespace, isAbstractConcept
+from .basicAbstractions import DirectAbstraction, ConstructedAbstraction, ReferencedAbstraction, isAbstractConcept
 
 """
 The .codedFunctionConcept module defines the codedFunctionConceptIdentity class, which is a ConceptIdentity that wraps python functions so that they can be used as a ConceptIdentity for codedFunctionConcepts.

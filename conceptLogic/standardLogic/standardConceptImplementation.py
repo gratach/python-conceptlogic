@@ -110,8 +110,8 @@ from ..conceptLogic.conceptLogic import ConceptImplementation, ConceptIdentity, 
 from .standardLogic import StandardNamespace as sn
 from .standardTools import ConceptGetter, SimpleConceptGetter, emptyConceptIdentity, SimpleConceptIdentity, ensureConcept
 
-basicsPrefix = b"basics"
-
+basicsPrefix = b"basics."
+defalutPrefix = b"default."
 
 class StandardLogic(ConceptLogic):
     """
@@ -189,7 +189,7 @@ class StandardConceptImplementation(ConceptImplementation):
         self._prefaredConstructionMode = prefaredConstructionMode
         self.implementationName = name
         self.prefix = prefix
-        self.id = prefix + b"." + name.encode("utf-8")
+        self.id = prefix + name.encode("utf-8")
         # Check if there is already a StandardConceptImplementation with this id
         if self.id in _standardConceptImplementationById:
             raise Exception("There is already a RegisteredConceptImplementation with this uuid.")
@@ -412,7 +412,7 @@ class ConstructedConceptClassIdentity(ConceptIdentity):
         self.identityName = name
         self.prefix = prefix
         # Generate a id for this instance
-        self.id = prefix + b"." + name.encode("utf-8")
+        self.id = prefix + name.encode("utf-8")
         # Check if there is already a StandardConceptImplementation with this id
         if self.id in _constructedConceptClassIdentityById:
             raise Exception("There is already a RegisteredConceptImplementation with this uuid.")
@@ -529,7 +529,7 @@ class CodedConceptClass(type):
             contentsByMetadata[metadata].append((name, content))
         
         # Extract the version
-        prefix = attrs.pop("prefix") if "prefix" in attrs else b"default"
+        prefix = attrs.pop("prefix") if "prefix" in attrs else defalutPrefix
 
         # Extract the data conversion methodes if they exist
         getContentFromData = attrs.get("getContentFromData")

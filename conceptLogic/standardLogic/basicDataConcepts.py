@@ -1,11 +1,13 @@
 import uuid
-from .standardConceptImplementation import CodedConceptClass, SimpleConceptIdentity, isInstanceOf, UUIDConcept, identifiedByTemporarySolution, temporaryConstructedConceptClassIdentifyer
+from .standardConceptImplementation import CodedConceptClass, SimpleConceptIdentity, isInstanceOf, UUIDConcept, identifiedByTemporarySolution, temporaryConstructedConceptClassIdentifyer, basicsPrefix, defalutPrefix
+
 
 class NumberConcept(metaclass=CodedConceptClass):
     """
     A CodedConceptIdentity that implements NumberConcepts (concepts representing numbers).
     It uses python floats as ConceptContent.
     """
+    prefix = basicsPrefix
     def getContentFromData(data, conceptLogic):
         return float(data)
 
@@ -23,6 +25,7 @@ class StringConcept(metaclass=CodedConceptClass):
     A CodedConceptIdentity that implements StringConcepts (concepts representing strings).
     It uses python string as concept content.
     """
+    prefix = basicsPrefix
     def getContentFromData(data, conceptLogic):
         return str(data, "utf-8")
 
@@ -32,12 +35,42 @@ class StringConcept(metaclass=CodedConceptClass):
     def contentValid(content, conceptLogic):
         return type(content) == str
 
+class IdentityConcept(metaclass=CodedConceptClass):
+    """
+    A CodedConceptIdentity that implements IdentityConcepts
+    It uses a bytes object as concept content.
+    """
+    prefix = basicsPrefix
+    def getContentFromData(data, conceptLogic):
+        return data
+
+    def getDataFromContent(content, conceptLogic):
+        return content
+    
+    def contentValid(content, conceptLogic):
+        return type(content) == bytes
+
+class BytesConcept(metaclass=CodedConceptClass):
+    """
+    A CodedConceptIdentity that implements BytesConcepts
+    It uses a bytes object as concept content.
+    """
+    prefix = basicsPrefix
+    def getContentFromData(data, conceptLogic):
+        return data
+
+    def getDataFromContent(content, conceptLogic):
+        return content
+    
+    def contentValid(content, conceptLogic):
+        return type(content) == bytes
+
 class UUIDConcept(metaclass=CodedConceptClass):
     """
     A CodedConceptIdentity that implements UUIDConcepts (concepts representing UUIDs).
     It uses python UUID objects as ConceptContent.
     """
-
+    prefix = basicsPrefix
     seedObject = UUIDConcept
 
     def getContentFromData(data, conceptLogic):
@@ -50,16 +83,9 @@ class UUIDConcept(metaclass=CodedConceptClass):
         return type(content) == uuid.UUID
     
     
-def uuidIdentity(name, namespaceUUID = uuid.NAMESPACE_DNS, seedObject=None):
-    return SimpleConceptIdentity(UUIDConcept, uuid.uuid3(namespaceUUID, name), name, seedObject=seedObject)
-
-class identityNamespace:
-    def __init__(self, name):
-        self.name = name
-        self.uuid = uuid.uuid3(uuid.NAMESPACE_DNS, name)
-    def __call__(self, name, seedObject=None):
-        return uuidIdentity(name, self.uuid, seedObject=seedObject)
+def newIdentityConcept(name, prefix = defalutPrefix, seedObject=None):
+    return SimpleConceptIdentity(IdentityConcept, prefix + name.encode("utf8"), name, seedObject=seedObject)
     
-isInstanceOf = uuidIdentity("isInstanceOf", seedObject=isInstanceOf)
-identifiedByTemporarySolution = uuidIdentity("identifiedByTemporarySolution", seedObject=identifiedByTemporarySolution)
-temporaryConstructedConceptClassIdentifyer = uuidIdentity("temporaryConstructedConceptClassIdentifyer", seedObject=temporaryConstructedConceptClassIdentifyer)
+isInstanceOf = newIdentityConcept("isInstanceOf", basicsPrefix, seedObject=isInstanceOf)
+identifiedByTemporarySolution = newIdentityConcept("identifiedByTemporarySolution", basicsPrefix, seedObject=identifiedByTemporarySolution)
+temporaryConstructedConceptClassIdentifyer = newIdentityConcept("temporaryConstructedConceptClassIdentifyer", basicsPrefix, seedObject=temporaryConstructedConceptClassIdentifyer)
