@@ -148,7 +148,15 @@ class StandardLogic(ConceptLogic):
             raise "Not Implemented"
         else:
             raise semanticConnectionsNotValid()
-
+ 
+def getConceptName(concept):
+    if concept.identity != None:
+        return concept.identity.identityName
+    elif concept.implementation.getNameFromContent != None:
+        return concept.implementation.getNameFromContent(concept.content, concept.conceptLogic)
+    else:
+        return concept.implementation.implementationName + "_instance"
+    
 
 class constructrionArgumentNotValid(Exception): # Exception raised by getContentFromPythonObject function
     def __init__(self):
@@ -267,7 +275,7 @@ class StandardConceptImplementation(ConceptImplementation):
         return SimpleConceptGetter(conceptCreationFunction)
     
     def __repr__(self):
-        return "ConceptImplementation " + self.implementationName + " " + self.version
+        return self.id.decode("utf-8")
     
 
 
@@ -462,6 +470,9 @@ class ConstructedConceptClassIdentity(ConceptIdentity):
     
     def getConcept(self, standardLogic):
         return standardLogic.getRawConceptFromIdentity(self)
+    
+    def __repr__(self):
+        return self.id.decode("utf-8")
 
 
 isInstanceOf = emptyConceptIdentity()

@@ -366,6 +366,14 @@ class Concept:
         """
         if self._conceptImplementation.callConcept != None:
             return self._conceptImplementation.callConcept(self)
+    
+    def __repr__(self):
+        """
+        Calls the onCall function of the Concept object.
+        """
+        if self._conceptImplementation.reprConcept != None:
+            return self._conceptImplementation.reprConcept(self)
+        return "Concept(" + repr(self.content) + ", " + repr(self._conceptImplementation) + ")"
         
     def __getattr__(self, name):
         """
@@ -401,7 +409,7 @@ class ConceptImplementation:
     def __init__(self, getContentFromData = None, getDataFromContent = None,
                  getConnectionsFromContent = None, getContentFromConnections = None, 
                  contentValid = None, initializeConcept = None,
-                 implementationSupported = None, getConceptAttribute = None, callConcept = None):
+                 implementationSupported = None, getConceptAttribute = None, callConcept = None, reprConcept = None):
         self.getContentFromData = getContentFromData
         self.getDataFromContent = getDataFromContent
         self.getConnectionsFromContent = getConnectionsFromContent
@@ -411,6 +419,7 @@ class ConceptImplementation:
         self.implementationSupported = implementationSupported
         self.getConceptAttribute = getConceptAttribute
         self.callConcept = callConcept
+        self.reprConcept = reprConcept
         if (self.getContentFromData == None) != (self.getDataFromContent == None):
             raise Exception("The ConceptImplementation object has to implement either the getContentFromData function and the getDataFromContent function or none of them.")
         if (self.getContentFromConnections == None) != (self.getConnectionsFromContent == None):

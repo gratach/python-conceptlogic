@@ -21,12 +21,14 @@ It also defines the ensureConcept function, which takes a MixedConceptReference 
 """
 from .standardTools import ensureConcept
 
+from .standardNameConvention import StandardNameConvention
+
 """
 The .standardConceptImplementation module defines the StandardConceptImplementation class, which is a ConceptImplementation that has an uuid assigned to it.
 The uuid is generated from the name and version of the StandardConceptImplementation and is used to identify the StandardConceptImplementation.
 This is important for importing and exporting dataConceptClass objects.
 """
-from .standardConceptImplementation import StandardLogic, emptyConceptIdentity, CodedConceptClass, DataConceptClass, ConstructedConceptClass, isInstanceOf, getConceptClass, hasConceptClass
+from .standardConceptImplementation import StandardLogic, emptyConceptIdentity, CodedConceptClass, DataConceptClass, ConstructedConceptClass, isInstanceOf, getConceptClass, hasConceptClass, getConceptName
 
 """
 The .basicDataConcepts module defines multiple basic DataConceptImplementations.
