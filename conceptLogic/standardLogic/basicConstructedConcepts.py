@@ -144,7 +144,39 @@ class ConnectionsConcept(metaclass=CodedConceptClass):
     def getContentFromPythonObject(content, conceptLogic):
         return frozenset([(*[None if y == None else ensureConcept(y, conceptLogic) for y in x],) for x in content])
     
+
+hasSubjectOfSemanticTriple = newIdentityConcept("hasSubjectOfSemanticTriple", basicsPrefix)
+hasPredicateOfSemanticTriple = newIdentityConcept("hasPredicateOfSemanticTriple", basicsPrefix)
+hasObjectOfSemanticTriple = newIdentityConcept("hasObjectOfSemanticTriple", basicsPrefix)
+class SemanticTripleConcept(metaclass=CodedConceptClass):
+    """
+    A concept representing a single semantic triple, consisting of a subject, a predicate and an object.
+    It has an triple of subject predicate and object concepts as conceptContent where none of those is None
+    """
+    prefix = basicsPrefix
+    def getContentFromConnections(semanticConnections, conceptLogic):
+        subj = readDistinctConnection(hasSubjectOfSemanticTriple, semanticConnections, conceptLogic)
+        pred = readDistinctConnection(hasPredicateOfSemanticTriple, semanticConnections, conceptLogic)
+        obj = readDistinctConnection(hasObjectOfSemanticTriple, semanticConnections, conceptLogic)
+        return (subj, pred, obj)
     
+    def getConnectionsFromContent(content, conceptLogic):
+        return frozenset([
+            (None, hasSubjectOfSemanticTriple.getConcept(conceptLogic), content[0]),
+            (None, hasPredicateOfSemanticTriple.getConcept(conceptLogic), content[1]),
+            (None, hasObjectOfSemanticTriple.getConcept(conceptLogic), content[2])
+        ])
+
+    def contentValid(content, conceptLogic):
+        if not isinstance(content, tuple):
+            return False
+        if not len(content) == 3:
+            return False
+        if any([x == None for x in content]):
+            return False
+        if any([not isinstance(x, Concept) for x in content]):
+            return False
+        return True
         
 
 

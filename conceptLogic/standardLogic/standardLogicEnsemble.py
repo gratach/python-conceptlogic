@@ -31,17 +31,17 @@ from .standardConceptImplementation import StandardLogic, emptyConceptIdentity, 
 """
 The .basicDataConcepts module defines multiple basic DataConceptImplementations.
 """
-from .basicDataConcepts import NumberConcept, UUIDConcept, StringConcept
+from .basicDataConcepts import NumberConcept, UUIDConcept, StringConcept, IdentityConcept, BytesConcept, newIdentityConcept
 
 """
 The .basicConstructedConcepts module defines multiple basic ConstructedConceptClassIdentities
 """
-from .basicConstructedConcepts import SetConcept, ConnectionConcept, ConnectionsConcept #listConcept
+from .basicConstructedConcepts import SetConcept, ConnectionConcept, ConnectionsConcept, SemanticTripleConcept, readDistinctConnection, writeDistinctConnection, readDistinctConnections, writeDistinctConnections
 
 """
 The .basicAbstractions module defines multiple basic ConstructedConceptClassIdentities for Abstract concepts
 """
-from .basicAbstractions import DirectAbstraction, ConstructedAbstraction, ReferencedAbstraction, isAbstractConcept
+from .basicAbstractions import DirectAbstraction, ConstructedAbstraction, ReferencedAbstraction, isAbstractConcept, TripleTrueAssertion
 
 """
 The .codedFunctionConcept module defines the codedFunctionConceptIdentity class, which is a ConceptIdentity that wraps python functions so that they can be used as a ConceptIdentity for codedFunctionConcepts.

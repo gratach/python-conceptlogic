@@ -1,5 +1,5 @@
 from io import StringIO
-from conceptLogic import StandardLogic, NumberConcept, StringConcept, SetConcept, DirectAbstraction, ConnectionConcept, ConnectionsConcept, isInstanceOf, writeTriples, readTriples, getConceptName, getConceptClass, ConstructedAbstraction, ReferencedAbstraction
+from conceptLogic import StandardLogic, NumberConcept, StringConcept, SetConcept, DirectAbstraction, ConnectionConcept, ConnectionsConcept, isInstanceOf, writeTriples, readTriples, getConceptName, getConceptClass, ConstructedAbstraction, ReferencedAbstraction, SemanticTripleConcept, TripleTrueAssertion
 
 testprefix = b"test."
 
@@ -18,6 +18,8 @@ def test():
     csc1 = ConnectionsConcept([(None, isInstanceOf, nr)], sl)
     ra1 = ReferencedAbstraction(testprefix + b"test1", sl)
     ca1 = ConstructedAbstraction([(None, t1, ra1)], sl)
+    st1 = SemanticTripleConcept((nr, t1, ra1), sl)
+    tta1 = TripleTrueAssertion((nr, t1, ra1), sl)
     concepts.update(sl.getLoadedConcepts())
 
 

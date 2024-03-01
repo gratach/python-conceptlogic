@@ -1,7 +1,7 @@
 from .standardConceptImplementation import CodedConceptClass, getConceptClass, hasConceptClass, basicsPrefix
 from ..conceptLogic.conceptLogic import Concept, semanticConnectionsNotSufficient, semanticConnectionsNotValid
 from .basicDataConcepts import NumberConcept, newIdentityConcept, IdentityConcept
-from .basicConstructedConcepts import readDistinctConnection, writeDistinctConnection, ConnectionsConcept
+from .basicConstructedConcepts import readDistinctConnection, writeDistinctConnection, ConnectionsConcept, SemanticTripleConcept
 from .standardTools import ensureConcept
 import uuid
 
@@ -83,6 +83,27 @@ class ReferencedAbstraction(metaclass=CodedConceptClass):
             id = pythonObject
             connections = frozenset()
         return (id, frozenset([(*[None if y == None else ensureAbstraction(y, conceptLogic) for y in x],) for x in connections]))
+    
+assertsTripleTrue = newIdentityConcept("assertsTripleTrue", basicsPrefix)
+class TripleTrueAssertion(metaclass=CodedConceptClass):
+    """
+    A concept that asserts that a given semanticTriple is true.
+    It has a semanticTriple as conceptContent that consists of three abstractConcepts.
+    """
+    prefix = basicsPrefix
+    def getContentFromConnections(semanticConnections, conceptLogic):
+        tripleConcept = readDistinctConnection(assertsTripleTrue, semanticConnections, conceptLogic)
+        return tripleConcept.content
+    
+    def getConnectionsFromContent(content, conceptLogic):
+        tripleConcept = SemanticTripleConcept(content, conceptLogic)
+        return writeDistinctConnection(tripleConcept, assertsTripleTrue, conceptLogic)
+    
+    def contentValid(content, conceptLogic):
+        return isinstance(content, tuple) and len(content) == 3 and all([isAbstractConcept(concept) for concept in content])
+    
+    def getContentFromPythonObject(pythonObject, conceptLogic):
+        return (*[ensureAbstraction(y, conceptLogic) for y in pythonObject],)
 
 def isAbstractConcept(concept):
     if not isinstance(concept, Concept):
