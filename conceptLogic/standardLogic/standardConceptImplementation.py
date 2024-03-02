@@ -142,7 +142,7 @@ class StandardLogic(ConceptLogic):
         conceptClass = conceptClasses[0]
         if conceptClass.implementation == ConstructedConceptClass.implementations[0]:
             # The conceptClass is an SpecifiedConstructedConceptClass
-            return conceptClass.identity.getImplementationAndContentFromConnections(semanticConnections, conceptLogic)
+            return conceptClass.content.getImplementationAndContentFromConnections(semanticConnections, conceptLogic)
         elif conceptClass.implementation == ConstructedConceptClass.implementations[1]:
             # The conceptClass is an GeneralConstructedConceptClass
             raise "Not Implemented"
