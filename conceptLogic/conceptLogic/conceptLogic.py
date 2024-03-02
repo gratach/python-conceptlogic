@@ -85,7 +85,7 @@ class ConceptLogic:
             assert conceptByIdentity == None and conceptByContent == None
             if conceptImplementation.implementationSupported != None and not conceptImplementation.implementationSupported(self):
                 raise Exception("The ConceptImplementation " + str(conceptImplementation) + " is not supported by this ConceptLogic object.")
-            conceptByIdentity = self._identifiedConcepts[conceptImplementation] = weakref.WeakValueDictionary()
+            conceptByIdentity = self._identifiedConcepts[conceptImplementation] = dict()
             conceptByContent = self._loadedConcepts[conceptImplementation] = weakref.WeakValueDictionary()
         return (conceptByIdentity, conceptByContent)
     
